@@ -63,7 +63,7 @@ void BidirectionalListManagement::addNewElementBegin(int value)
 		head = newElem;
 		head->getNext()->setPrev(newElem);
 	}
-	std::cout << "[INFO] New element added to the beggining." << std::endl;
+	count++;
 }
 
 
@@ -86,7 +86,26 @@ void BidirectionalListManagement::addNewElementEnd(int value)
 		tail->setNext(newElem);
 		tail = newElem;
 	}
-	std::cout << "[INFO] New element added to end." << std::endl;
+	count++;
+}
+
+void BidirectionalListManagement::addNewElementAnyWhere(int value, int position)
+{
+	BidirectionalList* newElem;
+	BidirectionalList* pointer;
+
+	newElem = new BidirectionalList;
+	pointer = getHead();
+	for (int i = 0; i < position; i++)
+	{
+		pointer = pointer->getNext();
+	}
+	newElem->setNext(pointer);
+	newElem->setPrev(pointer->getPrev());
+	newElem->setValue(value);
+	pointer->getPrev()->setNext(newElem);
+	pointer->setPrev(newElem);
+	count++;
 }
 
 //this is main function to add new element
@@ -111,7 +130,7 @@ void BidirectionalListManagement::addNewElement()
 }
 
 //same as upper method but with arguments
-void BidirectionalListManagement::addNewElement(int value, int position)
+double BidirectionalListManagement::addNewElement(int value, int position)
 {
 	BidirectionalList* newElem;
 	BidirectionalList* pointer;
@@ -121,32 +140,28 @@ void BidirectionalListManagement::addNewElement(int value, int position)
 		//usage of different methods
 		if (position == 0)
 		{
+			counter.start();
 			addNewElementBegin(value);
+			return counter.stop();
 		}
 		else if (position == count)
 		{
+			counter.start();
 			addNewElementEnd(value);
+			return counter.stop();
 		}
 		else
 		{
-			newElem = new BidirectionalList;
-			pointer = getHead();
-			for (int i = 0; i < position; i++)
-			{
-				pointer = pointer->getNext();
-			}
-			newElem->setNext(pointer);
-			newElem->setPrev(pointer->getPrev());
-			newElem->setValue(value);
-			pointer->getPrev()->setNext(newElem);
-			pointer->setPrev(newElem);
+			counter.start();
+			addNewElementAnyWhere(value, position);
+			return counter.stop();
 		}
-		count++;
 	}
 	else
 	{
 		std::cout << "[INFO] Position is out of list. Element has NOT been added." << std::endl << std::endl;
 	}
+	return 0.0;
 }
 
 void BidirectionalListManagement::showList()
@@ -171,6 +186,48 @@ void BidirectionalListManagement::showList()
 	}
 }
 
+void BidirectionalListManagement::deleteElementBegin()
+{
+	//if that's only element in list
+	if (count == 1)
+	{
+		delete head;
+		head = nullptr;
+		tail = nullptr;
+	}
+	else
+	{
+		head = head->getNext();
+		delete head->getPrev();
+		head->setPrev(nullptr);
+	}
+	count--;
+}
+
+void BidirectionalListManagement::deleteElementEnd()
+{
+	//this function doesn't check size of list
+	//if count > 1 this function is correct
+	//if count = 1 it would work excatly the same as deleteFromBegin so it will be used
+	tail = tail->getPrev();
+	delete tail->getNext();
+	tail->setNext(nullptr);
+	count--;
+}
+
+void BidirectionalListManagement::deleteElementAnywhere(int position)
+{
+	BidirectionalList* temp = getHead();
+	for (int i = 0; i < position; i++)
+	{
+		temp = temp->getNext();
+	}
+	temp->getNext()->setPrev(temp->getPrev());
+	temp->getPrev()->setNext(temp->getNext());
+	delete temp;
+	count--;
+}
+
 void BidirectionalListManagement::deleteElement()
 {
 	if (count > 0)
@@ -193,52 +250,37 @@ void BidirectionalListManagement::deleteElement()
 
 
 
-void BidirectionalListManagement::deleteElement(int position)
+double BidirectionalListManagement::deleteElement(int position)
 {
 	if (head)
 	{
 		//delete first element
 		if(position == 0)
 		{
-			//if that's only element in list
-			if (count == 1)
-			{
-				delete head;
-				head = nullptr;
-				tail = nullptr;
-			}
-			else
-			{
-				head = head->getNext();
-				delete head->getPrev();
-				head->setPrev(nullptr);
-			}
+			counter.start();
+			deleteElementBegin();
+			return counter.stop();
 		}
 		//delete last element
 		else if (position == count - 1)
 		{
-			tail = tail->getPrev();
-			delete tail->getNext();
-			tail->setNext(nullptr);
+			counter.start();
+			deleteElementEnd();
+			return counter.stop();
 		}
 		//delete from inside of list
 		else
 		{
-			BidirectionalList* temp = getHead();
-			for (int i = 0 ; i < position; i++)
-			{
-				temp = temp->getNext();
-			}
-			temp->getNext()->setPrev(temp->getPrev());
-			temp->getPrev()->setNext(temp->getNext());
-			delete temp;
+			counter.start();
+			deleteElementAnywhere(position);
+			return counter.stop();
 		}
-		count--;
 	}
 	else
 	{
 		std::cout << "[INFO] List is empty, nothing to delete." << std::endl;
 	}
+	return 0.0;
 }
 
 int BidirectionalListManagement::findElementPos()
@@ -266,41 +308,7 @@ int BidirectionalListManagement::findElementPos(int value)
 	return -1;
 }
 
-void BidirectionalListManagement::addNRandomElementsToList()
-{
-	int n = 0;
-	int down = 0;
-	int up = 0;
 
-	do
-	{
-		std::cout << "How many elements do you want to add: ";
-		std::cin >> n;
-		std::cin.get();
-	} while (n <= 0);
-	
-	std::cout << "What is bottom range of numbers: ";
-	std::cin >> down;
-	std::cin.get();
-
-	std::cout << "What is upper range of numbers: ";
-	std::cin >> up;
-	std::cin.get();
-
-
-	return addNRandomElementsToList(n,down,up);
-}
-
-void BidirectionalListManagement::addNRandomElementsToList(int n, int rangeDown, int rangeUp)
-{
-	int val = 0;
-	for (int i = 0; i < n; i++)
-	{
-		val = rand() % rangeUp + rangeDown;
-		addNewElementEnd(val);
-	}
-	std::cout << "[INFO] " << n << "elements has been added." << std::endl;
-}
 
 void BidirectionalListManagement::fillFromFile()
 {
@@ -366,4 +374,152 @@ void BidirectionalListManagement::saveToFile(std::string filename)
 	}
 }
 
+void BidirectionalListManagement::appendDoubleToTextFile(std::string filename, double dataToAppend)
+{
+	std::ofstream append;
+	append.open(filename, std::ios::app);
+	if (append.is_open())
+	{
+		append << dataToAppend << std::endl;
+	}
+	else
+	{
+		std::cout << "[INFO] File could NOT be created or opened. Nothing has been appended." << std::endl;
+	}
+	append.close();
+}
 
+// IMPORTANT FUNCTIONS
+
+double BidirectionalListManagement::addNRandomElementsToList()
+{
+	int choice = 0;
+	int position = 0;
+	int n = 0;
+	int down = 0;
+	int up = 0;
+
+	std::cout << "1. Add every new element to the beggining.\n" <<
+		"2. Add every new element to the end.\n" <<
+		"3. Add every new element to position...\n";
+	do
+	{
+		std::cout << "Your choice: ";
+		std::cin >> choice;
+		std::cin.get();
+	} while (choice < 1 || choice > 3);
+
+	if (choice == 1) position = 0;
+	else if (choice == 2) position = count;
+	else
+	{
+		std::cout << "Position of elements to add (0 - " << count << "): ";
+		std::cin >> position;
+		std::cin.get();
+	}
+
+	do
+	{
+		std::cout << "Number of elements to add: ";
+		std::cin >> n;
+		std::cin.get();
+	} while (n < 0);
+
+	std::cout << "Bottom range of elements: ";
+	std::cin >> down;
+	std::cin.get();
+
+	std::cout << "Top range of elements: ";
+	std::cin >> up;
+	std::cin.get();
+
+	return addNRandomElementsToList(position, n, down, up);
+}
+
+double BidirectionalListManagement::addNRandomElementsToList(int position, int n, int rangeDown, int rangeUp)
+{
+	int val = 0;
+	double time = 0.0;
+	double singleTime = 0.0;
+	for (int i = 0; i < n; i++)
+	{
+		val = rand() % rangeUp + rangeDown;
+		singleTime = addNewElement(val, position);
+		appendDoubleToTextFile("list_add_times.txt", singleTime);
+		time += singleTime;
+	}
+
+	std::cout << "[INFO] " << n << "elements has been added." << std::endl;
+	return time;
+}
+
+double BidirectionalListManagement::deleteAll()
+{
+	int choice = 0;
+	int pos = 0;
+
+	std::cout << "Choose type of deleting:\n" <<
+		"1. From the end to beggining.\n" <<
+		"2. From beggining to the end.\n" <<
+		"3. From selected position to end, and then to beggining...\n";
+	do
+	{
+		std::cout << "Your choice: ";
+		std::cin >> choice;
+		std::cin.get();
+	} while (choice < 1 && choice > 3);
+
+	if (choice == 1) pos = count - 1;
+	else if (choice == 2) pos = 0;
+	else
+	{
+		std::cout << "Insert position: ";
+		std::cin >> pos;
+		std::cin.get();
+	}
+
+	return deleteAll(pos);
+}
+
+double BidirectionalListManagement::deleteAll(int position)
+{
+	double singleTime = 0.0;
+	double time = 0.0;
+	int sizetemp = count;
+
+	for (int i = 0; i < sizetemp; i++)
+	{
+		singleTime = deleteElement(position);
+		time += singleTime;
+		appendDoubleToTextFile("table_delete_times_data.txt", singleTime);
+		if (position > count - 1) position = count - 1;
+	}
+	return time;
+}
+
+double BidirectionalListManagement::findElementTime()
+{
+	int val = 0;
+	std::cout << "Value of element to find: ";
+	std::cin >> val;
+	std::cin.get();
+
+
+	return findElementTime(val);
+}
+
+double BidirectionalListManagement::findElementTime(int value)
+{
+	BidirectionalList* temp = getHead();
+	double time = 0.0;
+	counter.start();
+	for (int i = 0; i < count; i++)
+	{
+		if (temp->getValue() == value)
+		{
+			break;
+		}
+		temp = temp->getNext();
+	}
+	return counter.stop();
+}

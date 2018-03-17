@@ -139,6 +139,7 @@ void Menu::tableMethods()
 			break;
 		case 9:
 			time = table.findElementInTableTime();
+			std::cout << "Time of finding was: " << time * 1000 << "mikroseconds." << std::endl << std::endl;
 		default:
 			break;
 		}
@@ -148,10 +149,10 @@ void Menu::tableMethods()
 
 void Menu::listMethods()
 {
-
+	double time = 0;
 	int choice = 0;
 	//number of possible choices
-	int choices = 8;
+	int choices = 10;
 
 	do {
 
@@ -160,10 +161,13 @@ void Menu::listMethods()
 		std::cout << "1. Show actual list" << std::endl;
 		std::cout << "2. Add new element..." << std::endl;
 		std::cout << "3. Delete element..." << std::endl;
-		std::cout << "4. Find element..." << std::endl;
-		std::cout << "5. Add N random elements..." << std::endl;
-		std::cout << "6. Fill from file..." << std::endl;
-		std::cout << "7. Save to file..." << std::endl;
+		std::cout << "4. Find element (get position)..." << std::endl;
+		std::cout << "5. Fill from file..." << std::endl;
+		std::cout << "6. Save to file" << std::endl << std::endl;
+		std::cout << "VVV Functions which return time of operations. VVV" << std::endl;
+		std::cout << "7. Add N random elements..." << std::endl;
+		std::cout << "8. Delete all elements..." << std::endl;
+		std::cout << "9. Find element..." << std::endl;
 		std::cout << choices << ". Back" << std::endl;
 
 		do
@@ -207,14 +211,21 @@ void Menu::listMethods()
 			break;
 
 		case 5:
-			listMng.addNRandomElementsToList();
-			break;
-		case 6:
 			listMng.fillFromFile();
 			break;
-		case 7:
+		case 6:
 			listMng.saveToFile();
 			break;
+		case 7:
+			time = listMng.addNRandomElementsToList();
+			std::cout << "Time of adding was: " << time << " ms. " << std:: endl << std::endl;
+			break;
+		case 8:
+			time = listMng.deleteAll();
+			std::cout << "Time of deleting was: " << time << "ms. " << std::endl << std::endl;
+		case 9:
+			time = listMng.findElementTime();
+			std::cout << "Time of finding was: " << time * 1000 << "mikroseconds." << std::endl << std::endl;
 		default:
 			break;
 		}
@@ -223,9 +234,11 @@ void Menu::listMethods()
 
 void Menu::heapMethods()
 {
+	double time = 0.0;
 	int choice = 0;
 	//number of possible choices
 	int choices = 8;
+	int pos = -1;
 
 	do {
 
@@ -235,9 +248,12 @@ void Menu::heapMethods()
 		std::cout << "2. Add new element..." << std::endl;
 		std::cout << "3. Delete element..." << std::endl;
 		std::cout << "4. Find element..." << std::endl;
-		std::cout << "5. Add N random elements..." << std::endl;
-		std::cout << "6. Fill from file..." << std::endl;
-		std::cout << "7. Save to file..." << std::endl;
+		std::cout << "5. Fill from file..." << std::endl;
+		std::cout << "6. Save to file..." << std::endl;
+		std::cout << "VVV Functions which return time of operations. VVV" << std::endl;
+		std::cout << "7. Add N random elements..." << std::endl;
+		std::cout << "8. Delete all elements..." << std::endl;
+		std::cout << "9. Find element..." << std::endl;
 		std::cout << choices << ". Back" << std::endl;
 
 		do
@@ -252,7 +268,7 @@ void Menu::heapMethods()
 		} while (choice > choices || choice <= 0);
 		std::cout << std::endl;
 
-		int pos = -1;
+		
 		switch (choice)
 		{
 		case 1:
@@ -282,13 +298,22 @@ void Menu::heapMethods()
 			break;
 
 		case 5:
-			heap.addNRandomNumbers();
-			break;
-		case 6:
 			heap.fillFromFile();
 			break;
-		case 7:
+		case 6:
 			heap.saveToFile();
+			break;
+		case 7:
+			time = heap.addNRandomNumbers();
+			std::cout << "Time of adding was: " << time << " ms. " << std::endl << std::endl;
+			break;
+		case 8:
+			time = heap.deleteAll();
+			std::cout << "Time of deleting was: " << time << "ms. " << std::endl << std::endl;
+			break;
+		case 9:
+			time = heap.findElementGetTime();
+			std::cout << "Time of finding was: " << time << "ms. " << std::endl << std::endl;
 			break;
 		default:
 			break;

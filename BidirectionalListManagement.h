@@ -11,8 +11,6 @@ private:
 	BidirectionalList* tail;
 	int count = 0;
 
-	void addNewElementBegin(int value);
-	void addNewElementEnd(int value);
 public:
 	BidirectionalListManagement();
 	~BidirectionalListManagement();
@@ -26,21 +24,38 @@ public:
 	void setCount(int count);
 
 	//functions, all with argument and without
+	void addNewElementBegin(int value);
+	void addNewElementEnd(int value);
+	void addNewElementAnyWhere(int value, int position);
 	void addNewElement();
-	void addNewElement(int value, int position);
+	double addNewElement(int value, int position);
+
 	void showList();
+
+	void deleteElementBegin();
+	void deleteElementEnd();
+	void deleteElementAnywhere(int position);
 	void deleteElement();
-	void deleteElement(int position);
+	double deleteElement(int position);
+
 	int findElementPos();
 	int findElementPos(int value);
-	void addNRandomElementsToList();
-	void addNRandomElementsToList(int n, int rangeDown, int rangeUp);
+	
 	//function add elements from file to existing list
 	void fillFromFile();
 	void fillFromFile(std::string filename);
 	void saveToFile();
 	void saveToFile(std::string filename);
+	void appendDoubleToTextFile(std::string filename, double dataToAppend);
 
-	//zrobic funkjce mierzace czas dodawanie, usuwanie, szukanie
+	//functions which return time of operations
+	double addNRandomElementsToList();
+	double addNRandomElementsToList(int position, int n, int rangeDown, int rangeUp);
+
+	double deleteAll();
+	double deleteAll(int position);
+
+	double findElementTime();
+	double findElementTime(int value);
 };
 

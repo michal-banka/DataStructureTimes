@@ -44,7 +44,6 @@ void BinaryHeap::swapElementsInHeap(int idx1, int idx2)
 	heap[idx1] = heap[idx2];
 	heap[idx2] = tempVal;
 }
-
 void BinaryHeap::addToHeap()
 {
 	int val = 0;
@@ -59,6 +58,8 @@ void BinaryHeap::addToHeap(int value)
 {
 	//temporary heap
 	int* temp = new int[size + 1];
+	int idx1 = size;
+	int idx2 = getParentIdx(size);
 
 	//fill temp with previous values
 	for (int i = 0; i < size; i++)
@@ -74,8 +75,7 @@ void BinaryHeap::addToHeap(int value)
 	heap = temp;
 
 	//move value while it's not on correct place
-	int idx1 = size;
-	int idx2 = getParentIdx(size);
+	
 
 	while(heap[idx1] > heap[idx2])
 	{
@@ -198,16 +198,22 @@ void BinaryHeap::deleteElement()
 
 }
 
-void BinaryHeap::deleteElement(int position)
+double BinaryHeap::deleteElement(int position)
 {
 	if (size != 0)
 	{
 		//for root
-		if (position == 0) deleteRoot();
+		if (position == 0)
+		{
+			counter.start();
+			deleteRoot();
+			size--;
+			return counter.stop();
+		}
 		//for last element
 		else if (position == size - 1)
 		{
-			std::cout << "LAST";
+			counter.start();
 			int* temp = new int[size - 1];
 			for (int i = 0; i < size - 1; i++)
 			{
@@ -215,10 +221,13 @@ void BinaryHeap::deleteElement(int position)
 			}
 			delete heap;
 			heap = temp;
+			size--;
+			counter.stop();
 		}
 		//delete anything else
 		else
 		{
+			counter.start();
 			//move last position to deleted element
 			heap[position] = heap[size - 1];
 
@@ -252,44 +261,13 @@ void BinaryHeap::deleteElement(int position)
 					position = getRightSonIdx(position);
 				}
 			}
+			size--;
+			counter.stop();
 		}
-		size--;
 	}
 	else
 	{
-		std::cout << "[INFO]Heap is empty. Root has NOT been deleted." << std::endl;
-	}
-}
-
-void BinaryHeap::addNRandomNumbers()
-{
-	int n = 0;
-	int down = 0;
-	int up = 0;
-
-	std::cout << "How many elements do you want to add: ";
-	std::cin >> n;
-	std::cin.get();
-
-	std::cout << "What is bottom range of numbers: ";
-	std::cin >> down;
-	std::cin.get();
-
-	std::cout << "What is upper range of numbers: ";
-	std::cin >> up;
-	std::cin.get();
-
-
-	return addNRandomNumbers(n, down, up);
-}
-
-void BinaryHeap::addNRandomNumbers(int n, int rangeDown, int rangeUp)
-{
-	int val = 0;
-	for (int i = 0; i < n; i++)
-	{
-		val = rand() % rangeUp + rangeDown;
-		addToHeap(val);
+		std::cout << "[INFO] Heap is empty. Root has NOT been deleted." << std::endl;
 	}
 }
 
@@ -355,4 +333,131 @@ void BinaryHeap::saveToFile(std::string filename)
 	{
 		std::cout << "[INFO] File could NOT be created/opened. " << std::endl;
 	}
+}
+
+void BinaryHeap::appendDoubleToTextFile(std::string filename, double dataToAppend)
+{
+	std::ofstream append;
+	append.open(filename, std::ios::app);
+	if (append.is_open())
+	{
+		append << dataToAppend << std::endl;
+	}
+	else
+	{
+		std::cout << "[INFO] File could NOT be created or opened. Nothing has been appended." << std::endl;
+	}
+	append.close();
+}
+
+//IMPORTANT FUNCTIONS
+
+double BinaryHeap::addNRandomNumbers()
+{
+	int n = 0;
+	int down = 0;
+	int up = 0;
+
+	do
+	{
+		std::cout << "How many elements do you want to add: ";
+		std::cin >> n;
+		std::cin.get();
+	} while (n <= 0);
+
+	std::cout << "What is bottom range of elements: ";
+	std::cin >> down;
+	std::cin.get();
+
+	std::cout << "What is upper range of elements: ";
+	std::cin >> up;
+	std::cin.get();
+
+
+	return addNRandomNumbers(n, down, up);
+}
+
+double BinaryHeap::addNRandomNumbers(int n, int rangeDown, int rangeUp)
+{
+	double time = 0.0;
+	double singleTime = 0.0;
+	int val = 0;
+
+	for (int i = 0; i < n; i++)
+	{
+		val = rand() % rangeUp + rangeDown;
+		counter.start();
+		addToHeap(val);
+		singleTime = counter.stop();
+		appendDoubleToTextFile("heap_add_times.txt", singleTime);
+		time += singleTime;
+	}
+	return time;
+}
+
+double BinaryHeap::deleteAll()
+{
+	int choice = 0;
+	int pos = 0;
+
+	std::cout << "Choose type of deleting:\n" <<
+		"1. From the end to beggining.\n" <<
+		"2. From beggining to the end.\n" <<
+		"3. From selected position to end, and then to beggining...\n";
+	do
+	{
+		std::cout << "Your choice: ";
+		std::cin >> choice;
+		std::cin.get();
+	} while (choice < 1 && choice > 3);
+
+	if (choice == 1) pos = size - 1;
+	else if (choice == 2) pos = 0;
+	else
+	{
+		std::cout << "Insert position: ";
+		std::cin >> pos;
+		std::cin.get();
+	}
+
+	return deleteAll(pos);
+}
+
+double BinaryHeap::deleteAll(int position)
+{
+	double singleTime = 0.0;
+	double time = 0.0;
+	int sizetemp = size;
+
+	for (int i = 0; i < sizetemp; i++)
+	{
+		singleTime = deleteElement(i);
+		time += singleTime;
+		appendDoubleToTextFile("table_delete_times_data.txt", singleTime);
+		if (position > size - 1) position = size - 1;
+	}
+	return time;
+}
+
+double BinaryHeap::findElementGetTime()
+{
+	int val = 0;
+	std::cout << "Value of element to find: ";
+	std::cin >> val;
+	std::cin.get();
+
+	return findElementGetTime(val);
+}
+
+double BinaryHeap::findElementGetTime(int value)
+{
+	counter.start();
+	for (int i = 0 ; i < size; i++)
+	{
+		if (heap[i] == value)
+		{
+			break;
+		}
+	}
+	return counter.stop();
 }
